@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Анкета программиста</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="form-container">
+        <h1>Анкета программиста</h1>
+        <p class="subtitle">Заполните все поля формы</p>
+
+        <form action="save.php" method="POST">
+            <div class="form-group">
+                <label for="full_name">ФИО *</label>
+                <input type="text" id="full_name" name="full_name" 
+                       placeholder="Иванов Иван Иванович" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label for="phone">Телефон *</label>
+                    <input type="tel" id="phone" name="phone" 
+                           placeholder="+7 (999) 123-45-67" required>
+                </div>
+                <div class="form-group half-width">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" name="email" 
+                           placeholder="example@mail.ru" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label for="birth_date">Дата рождения *</label>
+                    <input type="date" id="birth_date" name="birth_date" required>
+                </div>
+                <div class="form-group half-width">
+                    <label>Пол *</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="gender" value="male" required> Мужской
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="gender" value="female" required> Женский
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="languages">Любимые языки программирования *</label>
+                <select id="languages" name="languages[]" multiple size="4" required>
+                    <option value="1">Pascal</option>
+                    <option value="2">C</option>
+                    <option value="3">C++</option>
+                    <option value="4">JavaScript</option>
+                    <option value="5">PHP</option>
+                    <option value="6">Python</option>
+                    <option value="7">Java</option>
+                    <option value="8">Haskell</option>
+                    <option value="9">Clojure</option>
+                    <option value="10">Prolog</option>
+                    <option value="11">Scala</option>
+                    <option value="12">Go</option>
+                </select>
+                <small class="hint">Удерживайте Ctrl (Cmd на Mac) для выбора нескольких</small>
+            </div>
+
+            <div class="form-group">
+                <label for="bio">Биография</label>
+                <textarea id="bio" name="bio" rows="5" 
+                          placeholder="Расскажите о себе..."></textarea>
+            </div>
+
+            <div class="form-group checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="contract" required>
+                    <span class="checkmark"></span>
+                    Я ознакомлен(а) с контрактом *
+                </label>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="submit-btn">Сохранить</button>
+            </div>
+
+            <p class="required-note">* — обязательные поля</p>
+        </form>
+    </div>
+</body>
+</html>
