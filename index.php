@@ -5,7 +5,7 @@ ini_set('display_errors', 1);
 
 
 $db_host = 'localhost';
-$db_name = 'u82192';        
+$db_name = 'u82192';       
 $db_user = 'u82192';        
 $db_pass = '2307509'; 
 
@@ -17,11 +17,21 @@ try {
     $pdo = new PDO("mysql:host=$db_host;dbname=$db_name;charset=utf8", $db_user, $db_pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
+    
     $tables_exist = $pdo->query("SHOW TABLES LIKE 'programming_languages'")->rowCount() > 0;
     
     if (!$tables_exist) {
+     
+        $pdo->exec("DROP TABLE IF EXISTS application_languages");
+        $pdo->exec("DROP TABLE IF EXISTS applications");
+        $pdo->exec("DROP TABLE IF EXISTS programming_languages");
+        $pdo->exec("DROP TABLE IF EXISTS lang_list");
+        $pdo->exec("DROP TABLE IF EXISTS user_requests");
+        $pdo->exec("DROP TABLE IF EXISTS request_lang_relation");
+        
+        
         $pdo->exec("
-            CREATE TABLE IF NOT EXISTS programming_languages (
+            CREATE TABLE programming_languages (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 language_name VARCHAR(50) NOT NULL UNIQUE
             );
@@ -31,7 +41,7 @@ try {
             ('Python'), ('Java'), ('Haskell'), ('Clojure'), 
             ('Prolog'), ('Scala'), ('Go');
             
-            CREATE TABLE IF NOT EXISTS applications (
+            CREATE TABLE applications (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 full_name VARCHAR(150) NOT NULL,
                 phone VARCHAR(20) NOT NULL,
@@ -43,7 +53,7 @@ try {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
             
-            CREATE TABLE IF NOT EXISTS application_languages (
+            CREATE TABLE application_languages (
                 application_id INT UNSIGNED NOT NULL,
                 language_id INT UNSIGNED NOT NULL,
                 PRIMARY KEY (application_id, language_id),
@@ -53,11 +63,17 @@ try {
         ");
     }
     
+    $check_column = $pdo->query("SHOW COLUMNS FROM programming_languages LIKE 'language_name'")->rowCount();
+    if ($check_column == 0) {
+        $pdo->exec("ALTER TABLE programming_languages ADD COLUMN language_name VARCHAR(50) NOT NULL");
+    }
+    
     $stmt = $pdo->query("SELECT id, language_name FROM programming_languages ORDER BY language_name");
     $languages = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
 } catch(PDOException $e) {
     $error_message = "Ошибка подключения к БД: " . $e->getMessage();
+    
     $languages = [
         ['id' => 1, 'language_name' => 'Pascal'],
         ['id' => 2, 'language_name' => 'C'],
@@ -89,6 +105,7 @@ try {
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            
             background-image: url('fon1.jpg');
             background-size: cover;
             background-position: center;
@@ -99,6 +116,7 @@ try {
             position: relative;
         }
         
+       
         body::before {
             content: '';
             position: fixed;
@@ -106,14 +124,14 @@ try {
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.55);
+            background: rgba(0, 0, 0, 0.6);
             z-index: 0;
         }
         
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
+            background: white;
             border-radius: 15px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
