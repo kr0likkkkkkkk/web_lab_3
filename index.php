@@ -3,12 +3,12 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// ===== НАСТРОЙКИ БД - ИЗМЕНИТЕ НА СВОИ! =====
+
 $db_host = 'localhost';
-$db_name = 'u82192';        // ЗАМЕНИТЕ на имя вашей БД
-$db_user = 'u82192';        // ЗАМЕНИТЕ на ваш логин
-$db_pass = '2307509'; // ЗАМЕНИТЕ на ваш пароль
-// ============================================
+$db_name = 'u82192';        
+$db_user = 'u82192';        
+$db_pass = '2307509'; 
+
 
 $languages = [];
 $error_message = '';
