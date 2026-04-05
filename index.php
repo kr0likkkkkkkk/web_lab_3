@@ -109,9 +109,9 @@ try {
     padding: 20px;
     position: relative;
   
-    background-image: url('./fon1.jpg');
    
-    /* background-image: url('fon1.jpg'); */
+   
+     background-image: url('fon1.jpg'); 
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
