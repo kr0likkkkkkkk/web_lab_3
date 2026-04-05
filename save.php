@@ -1,107 +1,137 @@
 <?php
-$host = 'localhost';
-$dbname = 'u82192';      // ЗАМЕНИТЕ на свой логин
-$username = 'u82192';     // ЗАМЕНИТЕ на свой логин
-$password = '2307509';    // ЗАМЕНИТЕ на свой пароль
+session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Ошибка подключения к БД: " . $e->getMessage());
+// ===== НАСТРОЙКИ БД - ИЗМЕНИТЕ НА СВОИ! =====
+$db_host = 'localhost';
+$db_name = 'u12345';        // ЗАМЕНИТЕ на имя вашей БД
+$db_user = 'u12345';        // ЗАМЕНИТЕ на ваш логин
+$db_pass = 'your_password'; // ЗАМЕНИТЕ на ваш пароль
+// ============================================
+
+// Проверяем метод запроса
+if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+    header('Location: index.php');
+    exit();
 }
 
-$full_name = $_POST['full_name'] ?? '';
-$phone = $_POST['phone'] ?? '';
-$email = $_POST['email'] ?? '';
-$birth_date = $_POST['birth_date'] ?? '';
-$gender = $_POST['gender'] ?? '';
-$bio = $_POST['bio'] ?? '';
-$contract = isset($_POST['contract']) ? 1 : 0;
-$languages = $_POST['languages'] ?? [];
-
+// Сохраняем старые значения
+$_SESSION['old'] = $_POST;
 $errors = [];
 
-if (!preg_match('/^[а-яА-ЯёЁa-zA-Z\s]{1,150}$/u', $full_name)) {
-    $errors[] = 'ФИО должно содержать только буквы и пробелы (не длиннее 150 символов)';
+// 1. Валидация ФИО
+$full_name = trim($_POST['full_name'] ?? '');
+if (empty($full_name)) {
+    $errors[] = "ФИО обязательно для заполнения";
+} elseif (strlen($full_name) > 150) {
+    $errors[] = "ФИО не должно превышать 150 символов";
+} elseif (!preg_match('/^[a-zA-Zа-яА-ЯёЁ\s\-]+$/u', $full_name)) {
+    $errors[] = "ФИО может содержать только буквы, пробелы и дефисы";
 }
 
-$phone_clean = preg_replace('/[^0-9+]/', '', $phone);
-if (strlen($phone_clean) < 10) {
-    $errors[] = 'Телефон должен содержать минимум 10 цифр';
-}
-
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $errors[] = 'Введите корректный email';
-}
-
-if (empty($birth_date)) {
-    $errors[] = 'Укажите дату рождения';
-}
-
-if (!in_array($gender, ['male', 'female'])) {
-    $errors[] = 'Выберите пол';
-}
-
-if (empty($languages)) {
-    $errors[] = 'Выберите хотя бы один язык программирования';
-}
-
-if (!$contract) {
-    $errors[] = 'Необходимо подтвердить ознакомление с контрактом';
-}
-
-if (!empty($errors)) {
-    echo '<div style="background: #ffebee; color: #c33; padding: 15px; border-radius: 5px; margin: 20px; border-left: 4px solid #c33;">';
-    echo '<h3>Ошибки при заполнении формы:</h3>';
-    echo '<ul>';
-    foreach ($errors as $error) {
-        echo "<li>$error</li>";
+// 2. Валидация телефона
+$phone = trim($_POST['phone'] ?? '');
+if (empty($phone)) {
+    $errors[] = "Телефон обязателен для заполнения";
+} else {
+    $cleanPhone = preg_replace('/[^0-9+]/', '', $phone);
+    if (strlen($cleanPhone) < 10 || strlen($cleanPhone) > 15) {
+        $errors[] = "Неверный формат телефона";
     }
-    echo '</ul>';
-    echo '<p><a href="index.html">Вернуться к форме</a></p>';
-    echo '</div>';
-    exit;
 }
 
+// 3. Валидация email
+$email = trim($_POST['email'] ?? '');
+if (empty($email)) {
+    $errors[] = "Email обязателен для заполнения";
+} elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $errors[] = "Неверный формат email";
+} elseif (strlen($email) > 100) {
+    $errors[] = "Email не должен превышать 100 символов";
+}
+
+// 4. Валидация даты рождения
+$birth_date = $_POST['birth_date'] ?? '';
+if (empty($birth_date)) {
+    $errors[] = "Дата рождения обязательна для заполнения";
+} else {
+    $timestamp = strtotime($birth_date);
+    if (!$timestamp) {
+        $errors[] = "Неверный формат даты";
+    } else {
+        $age = date('Y') - date('Y', $timestamp);
+        if (date('md') < date('md', $timestamp)) $age--;
+        if ($age < 16 || $age > 120) {
+            $errors[] = "Возраст должен быть от 16 до 120 лет";
+        }
+    }
+}
+
+// 5. Валидация пола
+$gender = $_POST['gender'] ?? '';
+$allowed_genders = ['male', 'female', 'other'];
+if (empty($gender) || !in_array($gender, $allowed_genders)) {
+    $errors[] = "Выберите корректный пол";
+}
+
+// 6. Валидация языков
+$languages = $_POST['languages'] ?? [];
+if (empty($languages)) {
+    $errors[] = "Выберите хотя бы один язык программирования";
+}
+
+// 7. Валидация контракта
+$agreed = $_POST['agreed_to_contract'] ?? '';
+if ($agreed != '1') {
+    $errors[] = "Вы должны ознакомиться с контрактом";
+}
+
+// Если есть ошибки - возвращаемся
+if (!empty($errors)) {
+    $_SESSION['errors'] = $errors;
+    header('Location: index.php');
+    exit();
+}
+
+// Сохранение в БД
 try {
+    $pdo = new PDO("mysql:host=$db_host;dbname=$db_name;charset=utf8", $db_user, $db_pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    
     $pdo->beginTransaction();
     
+    // Вставка в applications
     $stmt = $pdo->prepare("
-        INSERT INTO applications 
-        (full_name, phone, email, birth_date, gender, bio, contract_accepted) 
+        INSERT INTO applications (full_name, phone, email, birth_date, gender, biography, agreed_to_contract) 
         VALUES (?, ?, ?, ?, ?, ?, ?)
     ");
     
-    $stmt->execute([
-        $full_name, $phone, $email, $birth_date, $gender, $bio, $contract
-    ]);
+    $biography = trim($_POST['biography'] ?? '');
+    $agreed_value = ($agreed == '1') ? 1 : 0;
     
+    $stmt->execute([$full_name, $phone, $email, $birth_date, $gender, $biography, $agreed_value]);
     $application_id = $pdo->lastInsertId();
     
-    $stmt = $pdo->prepare("
-        INSERT INTO application_languages (application_id, language_id) 
-        VALUES (?, ?)
-    ");
-    
+    // Вставка языков
+    $lang_stmt = $pdo->prepare("INSERT INTO application_languages (application_id, language_id) VALUES (?, ?)");
     foreach ($languages as $lang_id) {
-        $stmt->execute([$application_id, $lang_id]);
+        $lang_stmt->execute([$application_id, $lang_id]);
     }
     
     $pdo->commit();
     
-    echo '<div style="background: #e8f5e9; color: #2e7d32; padding: 15px; border-radius: 5px; margin: 20px; border-left: 4px solid #2e7d32;">';
-    echo '<h3>✅ Данные успешно сохранены!</h3>';
-    echo '<p>Спасибо за заполнение анкеты.</p>';
-    echo '<p><a href="index.html" style="color: #2e7d32;">Вернуться к форме</a></p>';
-    echo '</div>';
+    // Успех
+    unset($_SESSION['old']);
+    $_SESSION['success_message'] = "Данные успешно сохранены! Номер заявки: " . $application_id;
     
 } catch (PDOException $e) {
-    $pdo->rollBack();
-    
-    echo '<div style="background: #ffebee; color: #c33; padding: 15px; border-radius: 5px; margin: 20px;">';
-    echo '<h3>❌ Ошибка при сохранении в БД</h3>';
-    echo '<p>' . $e->getMessage() . '</p>';
-    echo '</div>';
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+    $_SESSION['errors'] = ["Ошибка базы данных: " . $e->getMessage()];
 }
+
+header('Location: index.php');
+exit();
 ?>
