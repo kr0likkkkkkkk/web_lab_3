@@ -118,16 +118,16 @@ try {
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: white;
+            background: #88117c4c;
             border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.32);
             overflow: hidden;
             position: relative;
             z-index: 1;
         }
         
         .header {
-            background: linear-gradient(135deg, #1a5f7a 0%, #2d6a4f 100%);
+            background: linear-gradient(135deg, #7d17ac 0%, #922db7 100%);
             color: white;
             padding: 30px;
             text-align: center;
@@ -178,7 +178,7 @@ try {
         select:focus,
         textarea:focus {
             outline: none;
-            border-color: #2d6a4f;
+            border-color: #522d6a;
             box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
         }
         
@@ -217,7 +217,7 @@ try {
             padding: 15px;
             background: #e8f5e9;
             border-radius: 8px;
-            border: 1px solid #c8e6c9;
+            border: 1px solid #d9c8e6e9;
         }
         
         .contract-checkbox input {
@@ -233,7 +233,7 @@ try {
         .btn-submit {
             width: 100%;
             padding: 14px;
-            background: linear-gradient(135deg, #1a5f7a 0%, #2d6a4f 100%);
+            background: linear-gradient(135deg, #791b7e 0%, #572d6a 100%);
             color: white;
             border: none;
             border-radius: 8px;
@@ -256,7 +256,7 @@ try {
         
         .alert-success {
             background: #d4edda;
-            color: #155724;
+            color: #de79e9;
             border: 1px solid #c3e6cb;
         }
         
@@ -287,21 +287,21 @@ try {
 <body>
     <div class="container">
         <div class="header">
-            <h1>📝 Анкета разработчика</h1>
+            <h1>Анкета разработчика</h1>
             <p>Заполните форму для участия в программе</p>
         </div>
         
         <div class="form-content">
             <?php if (isset($_SESSION['success_message'])): ?>
                 <div class="alert alert-success">
-                    ✅ <?= htmlspecialchars($_SESSION['success_message']) ?>
+                    <?= htmlspecialchars($_SESSION['success_message']) ?>
                 </div>
                 <?php unset($_SESSION['success_message']); ?>
             <?php endif; ?>
             
             <?php if (isset($_SESSION['errors']) && !empty($_SESSION['errors'])): ?>
                 <div class="alert alert-error">
-                    <strong>❌ Пожалуйста, исправьте следующие ошибки:</strong>
+                    <strong>Пожалуйста, исправьте следующие ошибки:</strong>
                     <ul style="margin-top: 10px; margin-left: 20px;">
                         <?php foreach ($_SESSION['errors'] as $error): ?>
                             <li><?= htmlspecialchars($error) ?></li>
@@ -313,7 +313,7 @@ try {
             
             <?php if (!empty($error_message)): ?>
                 <div class="alert alert-error">
-                    ⚠️ <?= htmlspecialchars($error_message) ?>
+                    <?= htmlspecialchars($error_message) ?>
                 </div>
             <?php endif; ?>
             
