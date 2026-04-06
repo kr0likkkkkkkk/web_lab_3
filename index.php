@@ -98,35 +98,22 @@ try {
     <title>Анкета разработчика</title>
     <style>
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+             margin: 0;
+             padding: 0;
+             box-sizing: border-box;
+             font-family: Arial, sans-serif;
         }
         
         body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-image: url('fon1.jpg'); 
+    background-size: cover; 
+    background-position: center; 
+    background-attachment: fixed; 
     min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     padding: 20px;
-    position: relative;
-  
-   
-   
-     background-image: url('fon1.jpg'); 
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-}
-
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: 0;
 }
         .container {
             max-width: 800px;
